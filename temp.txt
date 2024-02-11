@@ -1,0 +1,218 @@
+joxu
+joxujo
+Online
+
+joxu — 02/09/2024 7:17 PM
+https://github.com/jonxu101/Hacklytics2024
+GitHub
+GitHub - jonxu101/Hacklytics2024
+Contribute to jonxu101/Hacklytics2024 development by creating an account on GitHub.
+GitHub - jonxu101/Hacklytics2024
+k — 02/09/2024 7:32 PM
+https://hdsr.mitpress.mit.edu/pub/ct67j043/release/10
+Harvard Data Science Review
+Machine Learning With Statistical Imputation for Predicting Drug Ap...
+Machine Learning With Statistical Imputation for Predicting Drug Ap...
+joxu — 02/09/2024 7:36 PM
+https://www.kaggle.com/datasets/thedevastator/a-quick-overview-of-clinical-trials/code
+Clinical Trials
+13K Clinical trials over the years with start/end dates, phase, funding and more
+Image
+k — Yesterday at 10:15 AM
+Image
+https://lupustrials.org/about-trials/phases-of-a-trial/
+LupusTrials.org
+Susanna James
+Phases of a Trial - Treatment- Lupus Clinical Trials
+Learn about the thousands of lupus trials going on at any given time. Trials differ from studies in that the lupus patient will follow a specific treatment plan rather just be observed. Joining a trial will better inform the effort of finding lupus treatments and a cure.
+Phases of a Trial - Treatment- Lupus Clinical Trials
+joxu — Yesterday at 4:16 PM
+https://github.com/jonxu101/Hacklytics2024
+GitHub
+GitHub - jonxu101/Hacklytics2024
+Contribute to jonxu101/Hacklytics2024 development by creating an account on GitHub.
+GitHub - jonxu101/Hacklytics2024
+joxu — Yesterday at 4:38 PM
+"[0.10563425 0.17540282 0.08953524 0.16309718 0.1040311  0.08109872
+ 0.0725389  0.05994444 0.08701201 0.06170534]"
+k — Yesterday at 4:39 PM
+list_of_floats = [float(number) for number in input_string.split()]
+input_string = "[0.10563425 0.17540282 0.08953524 0.16309718 0.1040311  0.08109872\n 0.0725389  0.05994444 0.08701201 0.06170534]"
+
+Removing square brackets and newline characters, then splitting by spaces
+processed_string = input_string.strip("[]\n").replace("\n", " ")
+float_list = [float(num) for num in processed_string.split()]
+k — Yesterday at 5:44 PM
+https://www.dropbox.com/scl/fi/5grcxuficx5q6xxicvu8g/study_data_test_set.csv.zip?rlkey=atr1aopv7wo6jgicaj5ix0z01&dl=0
+Dropbox
+study_data_test_set.csv.zip
+Shared with Dropbox
+Image
+k — Yesterday at 5:59 PM
+Attachment file type: archive
+Archive.zip
+1.58 MB
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output, State
+import pandas as pd
+import plotly.express as px
+
+# Sample DataFrame
+df = pd.DataFrame({
+    'x': [1, 2, 3, 4, 5],
+    'y': [5, 4, 3, 2, 1]
+})
+
+# Initialize the Dash app
+app = dash.Dash(__name__)
+
+# App layout
+app.layout = html.Div([
+    dcc.Graph(id='scatter-plot'),
+    html.Div([
+        html.Label('X-coordinate:'),
+        dcc.Input(id='x-input', type='number', value=1),
+        html.Label('Y-coordinate:'),
+        dcc.Input(id='y-input', type='number', value=1),
+        html.Button('Show Point', id='show-point-btn'),
+    ]),
+])
+
+# Callback to update the graph based on user input
+@app.callback(
+    Output('scatter-plot', 'figure'),
+    [Input('show-point-btn', 'n_clicks')],
+    [State('x-input', 'value'), State('y-input', 'value')],
+)
+def update_graph(n_clicks, x_value, y_value):
+    if n_clicks is None:
+        raise dash.exceptions.PreventUpdate
+
+    # Create the scatter plot
+    fig = px.scatter(df, x='x', y='y', title='Scatter plot of Data Points')
+
+    # Highlight the user-specified point
+    fig.add_scatter(x=[x_value], y=[y_value], mode='markers', marker=dict(color='red', size=10), name='User Point')
+
+    return fig
+ 
+k — Yesterday at 8:07 PM
+import cvxpy as cp
+import numpy as np
+
+Example data
+n = 100 # Number of securities
+returns = np.random.uniform(0.05, 0.15, size=n) # Expected returns
+expected_losses = np.random.uniform(0.01, 0.03, size=n) # Expected loss for each security
+correlations = np.random.rand(n, n) # Correlation matrix
+correlations = (correlations + correlations.T) / 2 # Symmetrize
+np.fill_diagonal(correlations, 1)
+
+Risk tolerance (e.g., maximum acceptable aggregate expected loss)
+risk_tolerance = 0.02 * n # Example aggregate expected loss tolerance
+
+Variables
+weights = cp.Variable(n)
+
+Objective
+objective = cp.Maximize(weights.T @ returns)
+
+Constraints
+constraints = [
+    cp.sum(weights) == 1, # Sum of weights is 1
+    weights >= 0, # No short selling
+    cp.quad_form(weights, correlations) <= risk_tolerance, # Risk constraint
+    weights.T @ expected_losses <= risk_tolerance # Aggregate expected loss constraint
+]
+
+Problem
+problem = cp.Problem(objective, constraints)
+
+Solve
+problem.solve()
+
+Results
+optimized_weights = weights.value
+k — Yesterday at 9:33 PM
+323d7672a1
+k — Today at 1:32 AM
+https://docs.google.com/presentation/d/1ltOa45G2TcEywj35V_8tVz3sEV9XW9Va-uBrXOr0rlI/edit?usp=sharing
+Google Docs
+Hacklytics Slide Deck
+KEIGO HAYASHI JONATHAN XU QUANTITATIVE HEALTHCARE INVESTING HARNESSING DATA SCIENCE FOR IMPACTFUL HEALTHCARE INVESTING
+Image
+joxu — Today at 3:43 AM
+https://ctbs-dash-630c26238800.herokuapp.com/
+k — Today at 4:18 AM
+Quants: dubbed the Rocket Scientists of Wall Street, we—Jonathan and I—are emerging talents in this field, with Jonathan refining algorithms for a high-frequency market maker and myself devising systematic investment strategies. Yet, we often ponder a critical question: beyond enhancing market efficiency and liquidity, can our work serve a broader societal purpose?
+
+This curiosity propelled us into Hacklytics, not merely to compete but to explore how our quantitative skills could extend beyond financial markets to foster societal good. We asked ourselves, "Can we apply our expertise in data science and quantitative finance to not only predict markets but also promote social impact?" This project is our journey to discover that intersection.
+
+“Finance doesn’t have to be a zero-sum game. It is possible to do well by doing good, and to do well by our investors at the same time”
+Expand
+message.txt
+8 KB
+﻿
+k
+72inches
+Quants: dubbed the Rocket Scientists of Wall Street, we—Jonathan and I—are emerging talents in this field, with Jonathan refining algorithms for a high-frequency market maker and myself devising systematic investment strategies. Yet, we often ponder a critical question: beyond enhancing market efficiency and liquidity, can our work serve a broader societal purpose?
+
+This curiosity propelled us into Hacklytics, not merely to compete but to explore how our quantitative skills could extend beyond financial markets to foster societal good. We asked ourselves, "Can we apply our expertise in data science and quantitative finance to not only predict markets but also promote social impact?" This project is our journey to discover that intersection.
+
+“Finance doesn’t have to be a zero-sum game. It is possible to do well by doing good, and to do well by our investors at the same time”
+
+8 years ago I watched Andrew Lo’s TED talk where he discussed the issues of financing healthcare. Ever since, I have been inspired to see how as an computer scientist, I can save lives.
+
+What is the issue with clinical funding today?
+
+Here is a plot of Eroom’s Law, it shows the amount of new drugs per billion USD spent on R&D decreasing exponentially year after year.
+
+And if you haven’t noticed, Eroom’s Law is Moore’s law in reverse.
+
+Why is it that while our technology is advancing seemingly so rapidly, drug development, healthcare, and clinical trials seemingly aren’t? 
+It isn’t that they are not, it is that as those advancements occur, it becomes more difficult and difficult, more risky and risky to perform these trials. let me present you with the following opportunity:
+
+I’ll give you a bowl with 20 balls 1 of which is blue. You can invest in this for a mere upfront cost of $200 million. Now after 10 years, we will randomly choose a ball. if we pull the blue ball you win $13 Billion if we pull a yellow ball you win nothing (and lose your $200 million). 
+Now would you take this investment?
+
+This is the average profile of an investment in a new cancer drug. As you can see through the 4 phases of testing, the chances of success get slimmer and slimmer, with roughly 5% of drugs ultimately getting approved not to mention the very long waiting time as an investor.
+
+With such risks, it becomes harder and harder to find the funding necessary to research these life saving drugs. The sad reality is that without financing, even the biggest companies cannot take action.
+
+So what can we do about it?
+
+Let’s see what happens if we increase the number of bowls to 16. With this we now have a 55% change of at least 1 hit. But with that comes a hefty price tag of 3.2 billion dollars. Any takers? Let’s try increasing it to 64. Now there’s a 96% chance of at least 1 hit, 83% change of at least 2 hits, and 63% chance of at least 3 hits. Again with an upfront cost of a whopping 12.8 billion dollars. But the probability of success will rise as we take more bets.
+
+Here is where we can apply the ideas of financial engineering. Let’s take a lot of bowls and package them up. This will have a super high chance of a few drugs succeeding. But also a super high cost. Definitely not affordable for the average investor. So let’s chop them up into smaller chunks which may not get billions of upside but an attractive level of return for a lower upfront cost and lower risk.
+
+Now some of you may be skeptical, isn’t this exactly like the mortgage backed securities which caused the global financial crises back in 2007? We believe with the right regulations, best-standards financial engineering, and latest cutting edge technology, we can drive innovation in healthcare and drug development all while allowing investors to invest in a meaningful cause and generate attractive returns. 
+
+Our project centers on enhancing cancer treatment efficacy, with plans to broaden our scope to other medical areas. We aggregate extensive clinical trials data from [clinicaltrials.gov](http://clinicaltrials.gov/), encompassing over a hundred thousand entries, including both quantitative details like participant numbers and qualitative insights from experiment summaries. Utilizing advanced data cleaning methods and extracting features from textual data through sentence transformers, we feed this information into a neural network. This network predicts the likelihood of a clinical study's success, defined as progression to Phase 4.
+
+In the second phase, we apply this model to new, unseen data, calculating success probabilities for each study. These probabilities, alongside potential investment returns, are input into a mean-variance optimization algorithm borrowed from finance. This optimization process identifies an efficient frontier, offering a portfolio mix that balances risk and return optimally.
+
+Recognizing the diverse investment goals and risk tolerances of investors, from large hedge funds to individual retail investors, we aim to tailor portfolios to meet specific needs. Whether seeking high-risk, high-return investments or preferring lower risks for modest returns, our approach facilitates personalized investment strategies in critical healthcare advancements.
+
+The project is nowhere near done and this issue is one that continues to be heavily researched in academia. Here are some of the extensions:
+
+the first is data, data, data. There is lackluster data available on clinical trials. Finding cleaner data along with historic returns will likely allow for greater forecasting performance.
+
+ With the growing performance of large language models having abundant data especially unstructured data presents a huge opportunity for NLP as well as end-to-end learning.
+
+Moreover, we would like to invest more time into testing various ML and DL models and architectures to construct the best forecasting model.
+
+Lastly, there were a plethora of assumptions we made due to lack of time and data. We will definitely revisit these and contemplate them further.
+
+This hackalytics was a great experience for us and propelled us into this research.
+
+The project remains incomplete, with ongoing extensive research in academia. Our future directions include:
+
+- **Enhanced Data Acquisition**: The scarcity of comprehensive clinical trial data is a significant barrier. Access to cleaner, more detailed datasets, including historical returns, could substantially improve forecasting accuracy.
+- **Leveraging Large Language Models**: The advancement of large language models opens vast opportunities for utilizing unstructured data through NLP and end-to-end learning approaches, offering potential breakthroughs in predictive performance.
+- **Exploring Advanced Models**: We aim to dedicate more effort to experiment with various machine learning (ML) and deep learning (DL) models and architectures, striving to develop the optimal forecasting model.
+- **Revisiting Assumptions**: Due to initial constraints on time and data, we made several assumptions. A critical next step is to reassess and refine these assumptions for more accurate modeling.
+
+Participating in Hacklytics was a pivotal experience, steering us toward this research avenue and laying the groundwork for future exploration.
+message.txt
+8 KB
