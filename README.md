@@ -12,5 +12,16 @@ As a result, funding for clinical trials has become a risky prospect for any pot
 
 ---
 
-## Dataset
-In this project, we aggregate cancer clinical trial data from [clinicaltrials.gov](http://clinicaltrials.gov/). 
+## Dataset & Modeling
+In this project, we aggregate cancer clinical trial data from [clinicaltrials.gov](http://clinicaltrials.gov/). We queried for keyword 'cancer', which resulted in a dataset with approximately 60,000 rows. In addition to quantitative parameters such as Sponsors (via one-hot encoding) or number of participants, we incorporated qualitative data via machine learning. We utilized Hugging Face's sentence_transformer API in order to extract sentence vector representations, giving additional parameters to train on.
+
+We apply a Multilayer Perception (MLP) model on the feature-engineered dataset 
+
+---
+
+## Portfolio Optimization
+With our predicted success rate and returns, we now apply Markowitz Mean-Variance Optimization to solve for optimal weightings of each clinical trial. For a given risk tolerance, we may solve the following system:
+$$\underset{w, \max} w^T\hat{\mu}$$
+$$\text{s.t.}$$
+$$\Sum w_i = 1$$
+$$w^T\hat{\Sum}w \le sigma$$
