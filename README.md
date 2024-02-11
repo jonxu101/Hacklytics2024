@@ -21,7 +21,7 @@ We apply a Multilayer Perception (MLP) model on the feature-engineered dataset
 
 ## Portfolio Optimization
 With our predicted success rate and returns, we now apply Markowitz Mean-Variance Optimization to solve for optimal weightings of each clinical trial. For a given risk tolerance, we may solve the following system:
-$$\underset{w, \max} w^T\hat{\mu}$$
+$$\underset{w}{\max} w^T\hat{\mu}$$
 $$\text{s.t.}$$
 $$\sum w_i = 1$$
 $$w^T\hat{\sum}w \le sigma$$
