@@ -36,9 +36,12 @@ dummy_risk = []
 dummy_return = []
 dummy_color = []
 num_pts = 1000
+
+import math
+
 for i in range(num_pts):
     rand_risk = .22 + (.99-.22)*np.random.random()
-    ret = returns[ind_map[round(rand_risk, 2)]]
+    ret = returns[ind_map[round(math.floor(rand_risk * 100) / 100, 2)]]
     noise = abs(np.random.normal(0, 0.15 * ret))
     dummy_risk.append(rand_risk)
     dummy_return.append(ret - noise)
@@ -97,17 +100,19 @@ app.layout = html.Div([
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
                         'maxWidth': 10,
-                        'textAlign': 'left'
+                        'textAlign': 'left',
+                        'fontFamily': 'Times New Roman'
                     },
                     style_header={
                         'backgroundColor': 'white',
-                        'fontWeight': 'bold'
+                        'fontWeight': 'bold',
+                        'fontFamily': 'Times New Roman'
                     },
                     style_cell_conditional=[
                         {'if': {'column_id': 'NCT'},
                         'width': '15%'},
                         {'if': {'column_id': 'Weights'},
-                        'width': '20%'},
+                        'width': '15%'},
                     ],
                     style_as_list_view=True,
                     page_size=10,
@@ -128,7 +133,10 @@ app.layout = html.Div([
         dcc.Graph(id="plot", style={"margin-top": "0px"}),
     ], style={**component_box_style, 'width': '100%', 'boxSizing': 'border-box'}),
     html.Div([
-        html.P("Made by Keigo Hayashi and Jonathan Xu @ Hacklytics 2024"),
+        html.P("Made by Keigo Hayashi and Jonathan Xu @ Hacklytics 2024", 
+               style={
+                'text-align': 'center',
+                }),
     ], style={**component_box_style, 'width': '100%', 'boxSizing': 'border-box'}),
 ], style={'padding': '20px', 'boxSizing': 'border-box', 'fontFamily': 'Times New Roman', 'backgroundColor': background_color})
 
@@ -183,7 +191,7 @@ def update_graph(risk_slider):
 def update_graph(risk_slider):
     # Create the scatter plot
     table_data_copy = trial_info_df.copy()
-    table_data_copy.insert(0, "Weights", weights.iloc[ind_map[risk_slider]].values * 100)
+    table_data_copy.insert(0, "Weights", np.round(weights.iloc[ind_map[risk_slider]].values * 100, 2))
     return table_data_copy.sort_values("Weights", ascending=[False]).to_dict('records')
 
 if __name__ == '__main__':
