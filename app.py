@@ -30,32 +30,13 @@ ind_map = {
     data['Risk'][i] : int(i) for i in range(n)
 }
 
-def ComputeReturns(weights):
-    return np.matmul(np.array(returns * (1 - risks) - risks), weights.T)
-
-risk = np.array([(returns[i]**2 * (1-risks[i]) + risks[i]) - (returns[i] * (1-risks[i]) - risks[i])**2 for i in range(n)])
-dummy_risk = []
-dummy_return = []
-dummy_color = []
-num_pts = 1000
-
-import math
-
-for i in range(num_pts):
-    rand_risk = .22 + (.99-.22)*np.random.random()
-    ret = returns[ind_map[round(math.floor(rand_risk * 100) / 100, 2)]]
-    noise = abs(np.random.normal(0, 0.15 * ret))
-    dummy_risk.append(rand_risk)
-    dummy_return.append(ret - noise)
-    dummy_color.append(noise)
-    
-names = risk_return_df['NCT'].tolist()
-scatter_df = pd.DataFrame(zip(dummy_risk, dummy_return, dummy_color), columns=['Risk', 'Return','Color'])
-print(scatter_df)
+scatter_df = pd.read_csv('scatter.csv')
 
 trial_info_df = risk_return_df[['NCT', 'Website', 'Condition']]
 trial_info_df.insert(2, 'Link', [f"<a href='{website}' target='_blank'>{website}</a>" for website in trial_info_df['Website']])
 trial_info_df = trial_info_df.drop(columns=["Website"])
+
+names = risk_return_df['NCT'].tolist()
 
 # Styles
 component_box_style = {
