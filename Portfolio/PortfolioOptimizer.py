@@ -17,7 +17,7 @@ np.random.seed(42)
 #     returns_noise = 0.5 # log normal returns
 
 #     for i in range(num_pts):
-#         risk = np.max(1 / (mean + np.random.normal()), 0)
+#         risk = 1 - np.max(1 / (mean + np.random.normal()), 0)
 #         rand_data.append(["Disease " + str(i), risk, np.exp(np.log(mean) + returns_noise * np.random.normal())])
         
 #     rand_data_df = pd.DataFrame(rand_data, columns = col_names)
@@ -25,12 +25,12 @@ np.random.seed(42)
 
 
 input = "./predicted.csv"
-data = pd.read_csv(input)
+data = pd.read_csv(input, nrows=1000)
 n = len(data)
 # CovarRisk = np.diag(data['Risk'] ** 2)
 
-MeanReturns = data['Return']
-AEq = np.ones(MeanReturns.T.shape)
+# MeanReturns = data['Return']
+# AEq = np.ones(MeanReturns.T.shape)
 
 # def MaximizeReturns(data, PortfolioSize): #optimize with no risk
 #     c = np.multiply(-1, data['Return'].tolist())
@@ -57,19 +57,19 @@ AEq = np.ones(MeanReturns.T.shape)
     
 #     return weights.x
 
+# expected_mu = data['Return'] * (1-data['Risk'])
 
 # def MeanVar(data, size, R):    
 #     def f(x):
-#         return np.matmul(np.matmul(x, CovarRisk), x.T) 
+#         return -np.matmul(expected_mu, x.T) 
 
 #     def constraintEq(x):
 #         return np.matmul(AEq,x.T)-1 
     
 #     def constraintIneq(x, R):
-#         return np.matmul(np.array(MeanReturns), x.T) - R
-    
+#         return np.matmul(data['Risk'], x.T) - R
 
-#     xinit=np.repeat(0.1, size)
+#     xinit=np.repeat(1/size, size)
 #     cons = ({'type': 'eq', 'fun':constraintEq},
 #             {'type':'ineq', 'fun':constraintIneq, 'args': [R] })
 #     lb = 0
@@ -80,29 +80,29 @@ AEq = np.ones(MeanReturns.T.shape)
 #     return res.x
 
 def ComputeReturns(data, weights):
-    return np.matmul(np.array(data['Return'].tolist()), weights.T)
+    return np.matmul(np.array(data['Return'] * (1 - data['Risk']) - data['Risk']), weights.T)
 
-# def ComputeRisk(data, weights):
-#     return np.sqrt(np.matmul(np.matmul(weights, CovarRisk), weights.T))
+# # def ComputeRisk(data, weights):
+# #     return np.sqrt(np.matmul(np.matmul(weights, CovarRisk), weights.T))
 
 # # n = len(data)
-# # incr = 0.1
+# incr = 0.01
 
-# min = ComputeReturns(data, MinimizeReturns(data, n))
-# max = ComputeReturns(data, MaximizeReturns(data, n))
+# # min = ComputeReturns(data, MinimizeReturns(data, n))
+# # max = ComputeReturns(data, MaximizeReturns(data, n))
 
-# print(min)
-# print(max)
+# # print(min)
+# # print(max)
 
 # frontier_risk = []
 # frontier_return = []
 # frontier_weights = []
 
-# R = min # target return
-# while R < max:
+# R = 0 # target return
+# while R < 1:
 #     res = MeanVar(data, n, R)
-#     frontier_risk.append(ComputeRisk(data, res))
-#     frontier_return.append(R)
+#     frontier_risk.append(R)
+#     frontier_return.append(ComputeReturns(data, res))
 #     frontier_weights.append(res)
 #     R += incr
     
@@ -112,19 +112,21 @@ from pypfopt.efficient_frontier import EfficientFrontier
 import pypfopt.objective_functions as objective_functions
 
 print("pypfopt")
-expected_returns = data['Return']
+expected_returns = data['Return'] * (1 - data['Risk'])
 # cov_matrix = np.array([[(data['Risk'][i]**2 if i == j else 0) for i in range(n)] for j in range(n)])
-cov_matrix = np.diag(data['Risk']**2)
+risk = [(data['Return'][i]**2 * (1-data['Risk'][i]) + data['Risk'][i]) - (data['Return'][i] * (1-data['Risk'][i]) - data['Risk'][i])**2 for i in range(n)]
+cov_matrix = np.diag(risk)
+print(cov_matrix)
 # print(cov_matrix)
 print("t1")
 
 ef = EfficientFrontier(expected_returns, cov_matrix)
-ef.add_objective(objective_functions.L2_reg)
+ef.add_objective(objective_functions.L2_reg, gamma = 0.1)
 
 print("t2")
 n = len(data)
-incr = 0.001
-min = 0.00
+incr = 0.01
+min = 0.0
 max = 1
 
 print(min)
@@ -143,23 +145,25 @@ while R < max:
         print("t4")
         res = np.array([i[1] for i in res.items()])
         
-        print("t5")
-        frontier_risk.append(round(R, 3))
+        # print("t5")
+        frontier_risk.append(np.sqrt(round(R, 3)))
         frontier_return.append(ComputeReturns(data, res))
         frontier_weights.append(res)
         R += incr
-        if frontier_return[-1] - prev < tol:
-            break
+        # if frontier_return[-1] - prev < tol:
+        #     break
         prev = frontier_return[-1]
+        pd.DataFrame(frontier_weights, columns = [str(i) for i in range(n)]).to_csv("./weights.csv", index = False)
+        pd.DataFrame(zip(frontier_risk,frontier_return), columns = ['Risk', 'Return']).to_csv("./efficient_frontier.csv", index = False)
     except ValueError as e:
         print("except")
         R += incr
     
-# plt.figure()
-# plt.scatter(frontier_risk, frontier_return)
-# plt.xlabel("Risk (%)")
-# plt.ylabel("Expected Return (%)")
-# plt.show()
+plt.figure()
+plt.scatter(frontier_risk, frontier_return)
+plt.xlabel("Risk (%)")
+plt.ylabel("Expected Return (%)")
+plt.show()
 
 pd.DataFrame(frontier_weights, columns = [str(i) for i in range(n)]).to_csv("./weights.csv", index = False)
-output_data = pd.DataFrame(zip(frontier_risk,frontier_return), columns = ['Risk', 'Return']).to_csv("./efficient_frontier.csv", index = False)
+pd.DataFrame(zip(frontier_risk,frontier_return), columns = ['Risk', 'Return']).to_csv("./efficient_frontier.csv", index = False)
