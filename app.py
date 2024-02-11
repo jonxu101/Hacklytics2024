@@ -136,12 +136,12 @@ def generate_chart(risk_slider):
     # ind = bisect.bisect_left(ind_map.keys(), risk_slider)
     risk_slider = round(risk_slider, 3)
     df = pd.DataFrame(zip(names, weights.iloc[ind_map[risk_slider]].values), columns = ['name', 'weight'])
-    fig = px.pie(df, values='weight', names='name', hole=0.3, labels=None)
+    fig = px.pie(df.sort_values('weight', ascending = [False]).head(10), values='weight', names='name', hole=0.3, labels=None)
     fig.update_layout(
         font=dict(family="Times New Roman", size=20, color="RebeccaPurple")  # Update font here
     )
     fig.update_traces(textposition='inside')
-    fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide', showlegend=False)
+    # fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide', showlegend=False)
     fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
     return fig
 

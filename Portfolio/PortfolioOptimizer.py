@@ -25,7 +25,7 @@ np.random.seed(42)
 
 
 input = "./predicted.csv"
-data = pd.read_csv(input, nrows=1000)
+data = pd.read_csv(input, nrows=100)
 n = len(data)
 # CovarRisk = np.diag(data['Risk'] ** 2)
 
@@ -127,7 +127,7 @@ print("t2")
 n = len(data)
 incr = 0.01
 min = 0.0
-max = 1
+max = 5
 
 print(min)
 print(max)
