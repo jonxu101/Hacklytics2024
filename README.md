@@ -2,6 +2,7 @@
 ---
 #### TL;DR This is a project for Hacklytics 2024, where we develop a model for assessing the success rate of cancer-related clinical trials. In our interactive web-app (hosted [here](https://ctbs-dash-630c26238800.herokuapp.com/)), we are able to provide an optimal portfolio construction that maximizes expected return for a user-input risk tolerance.
 ---
+## Background
 Quants. The Rocket Scientists of Wall Street. The math geeks and PhDs wield cutting-edge technology to predict financial markets' movements. Indeed, Jonathan and I are on the path to becoming quants, having already dipped our toes in the industry waters—Jonathan as a quantitative developer at a prominent high-frequency trading firm, and myself as a quantitative researcher devising systematic investment strategies. However, a recurring question challenges our professional aspirations: beyond "generating deep liquidity" and "creating more efficient markets," do quants contribute anything of real value to society?
 
 This curiosity propelled us into Hacklytics, not merely to compete but to explore how our quantitative skills could extend beyond financial markets to foster societal good. We asked ourselves, "Can we apply our expertise in data science and quantitative finance to not only predict markets but also promote social impact?" This project is our journey to discover that intersection.
@@ -20,8 +21,18 @@ We apply a Multilayer Perception (MLP) model on the feature-engineered dataset
 ---
 
 ## Portfolio Optimization
-With our predicted success rate and returns, we now apply Markowitz Mean-Variance Optimization to solve for optimal weightings of each clinical trial. For a given risk tolerance, we may solve the following system:
+With our predicted success rate and returns, we now apply Markowitz Mean-Variance Optimization to solve for optimal weightings of each clinical trial. For a given risk tolerance $\sigma$, we may solve the following system:
 $$\underset{w}{\max} w^T\hat{\mu}$$
 $$\text{s.t.}$$
 $$\sum w_i = 1$$
-$$w^T\hat{\Sigma}w \le sigma$$
+$$w^T\hat{\Sigma}w \le \sigma$$
+This a linear programming problem, and we utilize scipy and pypfopt to optimize these constraints. By generating the maximal expected return over a series of risk tolerances, we are able to produce the Efficient Frontier, 
+
+---
+
+## Interactive Dashboard
+Our interactive dashboard found [here](https://ctbs-dash-630c26238800.herokuapp.com/) displays the recommended porfolio distribution given 1000 clinical trials as a test set. The interactive slider allows the user to specify a risk tolerance. After specifying a risk tolerance, the website automatically updates the elements to reflect the optimal portfolio construction.
+
+The data table and pie chart illustrate the distribution that maximizes returns for the given risk tolerance. The data table features basic information about the relevant clinical trial, with a clickable hotlink to the full information found on clinicaltrials.gov.
+
+At the bottom of the page is a graph that illustrates the Efficient Frontier. The EFficient Frontier is plotted as an orange line, along with the expected returns of randomly generated suboptimal weightings. The red point represents the user selected risk tolerance, which updates accordingly on the graph everytime the user changes the risk tolerance.
