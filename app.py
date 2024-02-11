@@ -14,14 +14,14 @@ app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
-data = pd.read_csv('./efficient_frontier.csv')
-weights = pd.read_csv('./weights.csv')
+data = pd.read_csv('./data/efficient_frontier.csv')
+weights = pd.read_csv('./data/weights.csv')
 n = len(data)
 min_risk = data['Risk'][0]
 max_risk = data['Risk'][n - 1]
 incr = data['Risk'][0]
 # data.insert(-1, "Risk2", np.sqrt(data['Risk']))
-risk_return_df = pd.read_csv('./predicted_out.csv')
+risk_return_df = pd.read_csv('./data/predicted_out.csv')
 returns = data['Return']
 risks = data['Risk']
 
@@ -30,7 +30,7 @@ ind_map = {
     data['Risk'][i] : int(i) for i in range(n)
 }
 
-scatter_df = pd.read_csv('scatter.csv')
+scatter_df = pd.read_csv('./data/scatter.csv')
 
 trial_info_df = risk_return_df[['NCT', 'Website', 'Condition']]
 trial_info_df.insert(2, 'Link', [f"<a href='{website}' target='_blank'>{website}</a>" for website in trial_info_df['Website']])
