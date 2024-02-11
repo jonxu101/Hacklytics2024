@@ -38,12 +38,13 @@ dummy_color = []
 num_pts = 1000
 for i in range(num_pts):
     rand_risk = .22 + (.99-.22)*np.random.random()
-    noise = min(0.5, abs(np.random.normal(0, 0.3)))
+    ret = returns[ind_map[round(rand_risk, 2)]]
+    noise = abs(np.random.normal(0, 0.15 * ret))
     dummy_risk.append(rand_risk)
-    dummy_return.append(returns[ind_map[round(rand_risk, 2)]] - noise)
+    dummy_return.append(ret - noise)
     dummy_color.append(noise)
     
-names = risk_return_df['Name'].tolist()
+names = risk_return_df['NCT'].tolist()
 scatter_df = pd.DataFrame(zip(dummy_risk, dummy_return, dummy_color), columns=['Risk', 'Return','Color'])
 print(scatter_df)
 
@@ -66,7 +67,8 @@ background_color = '#F0F0F0'  # Slight gray background
 header_style = {
     'textAlign': 'center', 
     'color': '#333', 
-    'fontWeight': 'bold'  # Make the header text bold
+    'fontWeight': 'bold',  # Make the header text bold
+    'margin-bottom' : "0px",
 }
 
 app.layout = html.Div([
@@ -87,9 +89,10 @@ app.layout = html.Div([
                 dash_table.DataTable(
                     id='table',
                     columns=[{"id": "NCT", "name" : "NCT"},
+                             {"id": "Weights", "name" : "Weight (%)"},
                              {"id": "Condition", "name": "Condition"},
                              {"id": "Link", "name" : "Website", "presentation" : "markdown"}],
-                    data=trial_info_df.to_dict('records'),
+                    # data=trial_info_df.to_dict('records'),
                     style_cell={
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
@@ -103,6 +106,8 @@ app.layout = html.Div([
                     style_cell_conditional=[
                         {'if': {'column_id': 'NCT'},
                         'width': '15%'},
+                        {'if': {'column_id': 'Weights'},
+                        'width': '20%'},
                     ],
                     style_as_list_view=True,
                     page_size=10,
@@ -113,14 +118,17 @@ app.layout = html.Div([
         ], style={**component_box_style, 'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
         
         html.Div([  # Top Right Quadrant: Pie Chart
-            
+            html.H1("Portfolio Allocation Weights", style=header_style),
             dcc.Graph(id="graph"),
         ], style={**component_box_style, 'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
     ], style={'display': 'flex', 'boxSizing': 'border-box', 'alignItems': 'stretch', 'backgroundColor': background_color, 'justifyContent': 'space-between'}),
 
     html.Div([
-        dcc.Graph(id="plot"),
-        html.Div(id='risk-output-container'),
+        html.H1("Efficient Frontier (Risk Return Trade-off)", style=header_style),
+        dcc.Graph(id="plot", style={"margin-top": "0px"}),
+    ], style={**component_box_style, 'width': '100%', 'boxSizing': 'border-box'}),
+    html.Div([
+        html.P("Made by Keigo Hayashi and Jonathan Xu @ Hacklytics 2024"),
     ], style={**component_box_style, 'width': '100%', 'boxSizing': 'border-box'}),
 ], style={'padding': '20px', 'boxSizing': 'border-box', 'fontFamily': 'Times New Roman', 'backgroundColor': background_color})
 
@@ -139,7 +147,6 @@ def generate_chart(risk_slider):
     df = pd.DataFrame(zip(names, weights.iloc[ind_map[risk_slider]].values), columns = ['name', 'weight'])
     fig = px.pie(df, values='weight', names='name', hole=0.3, labels=None)
     fig.update_layout(
-        title_text='Portfolio Allocation Weights',
         font=dict(family="Times New Roman", size=20, color="RebeccaPurple")  # Update font here
     )
     fig.update_traces(textposition='inside')
@@ -147,11 +154,11 @@ def generate_chart(risk_slider):
     fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
     return fig
 
-@app.callback(
-    Output('risk-output-container', 'children'),
-    Input('risk_slider', 'value'))
-def update_output(risk_slider):
-    return 'You have selected risk="{}"'.format(risk_slider)
+# @app.callback(
+#     Output('risk-output-container', 'children'),
+#     Input('risk_slider', 'value'))
+# def update_output(risk_slider):
+#     return 'You have selected risk="{}"'.format(risk_slider)
 
 @app.callback(
     Output(component_id='plot', component_property='figure'),
@@ -166,10 +173,18 @@ def update_graph(risk_slider):
     fig2.add_scatter(x=[risk_slider], y=[data['Return'][ind_map[risk_slider]]], mode='markers', marker=dict(color='red', size=20), name='Selected Risk Level')
     fig.add_traces(fig2.data)
     fig.update_layout(
-        title='Efficient Frontier (Risk Return Trade-off)',
         font=dict(family="Times New Roman", size=20, color="RebeccaPurple"),  # Update font here
     )
     return fig
+
+@app.callback(
+    Output(component_id='table', component_property='data'),
+    Input('risk_slider', 'value'))
+def update_graph(risk_slider):
+    # Create the scatter plot
+    table_data_copy = trial_info_df.copy()
+    table_data_copy.insert(0, "Weights", weights.iloc[ind_map[risk_slider]].values * 100)
+    return table_data_copy.sort_values("Weights", ascending=[False]).to_dict('records')
 
 if __name__ == '__main__':
     app.run(debug=True)

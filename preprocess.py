@@ -1,7 +1,7 @@
 import pandas as pd
 
-df = pd.read_csv('predicted.csv')
-all_data = pd.read_csv('study_data_test_set.csv')
+df = pd.read_csv('predicted.csv', nrows=1000)
+all_data = pd.read_csv('study_data_test_set.csv', nrows=1000)
 
 # print(all_data)
 
