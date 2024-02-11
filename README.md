@@ -1,4 +1,4 @@
-### Quantitative Healthcare Investing via "Clinical Trial Backed Securities"
+# Quantitative Healthcare Investing via "Clinical Trial Backed Securities"
 Quants: dubbed the Rocket Scientists of Wall Street, we—Jonathan and I—are emerging talents in this field, with Jonathan refining algorithms for a high-frequency market maker and myself devising systematic investment strategies. Yet, we often ponder a critical question: beyond enhancing market efficiency and liquidity, can our work serve a broader societal purpose?
 
 This curiosity propelled us into Hacklytics, not merely to compete but to explore how our quantitative skills could extend beyond financial markets to foster societal good. We asked ourselves, "Can we apply our expertise in data science and quantitative finance to not only predict markets but also promote social impact?" This project is our journey to discover that intersection.
