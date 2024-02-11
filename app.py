@@ -18,21 +18,39 @@ n = len(data)
 min_risk = data['Risk'][0]
 max_risk = data['Risk'][n - 1]
 incr = data['Risk'][0]
-
-risk_return_df = pd.read_csv('./riskreturn.csv')
-
-names = risk_return_df['Name'].tolist()
-print(names)
-print(weights.iloc[0].values)
-
-trial_info_df = risk_return_df[['Website', 'OtherInfo']]
+# data.insert(-1, "Risk2", np.sqrt(data['Risk']))
+risk_return_df = pd.read_csv('./predicted_out.csv')
+returns = data['Return']
+risks = data['Risk']
 
 ind_map = collections.OrderedDict()
 ind_map = {
     data['Risk'][i] : int(i) for i in range(n)
 }
 
-print(ind_map)
+def ComputeReturns(weights):
+    return np.matmul(np.array(returns * (1 - risks) - risks), weights.T)
+
+risk = np.array([(returns[i]**2 * (1-risks[i]) + risks[i]) - (returns[i] * (1-risks[i]) - risks[i])**2 for i in range(n)])
+dummy_risk = []
+dummy_return = []
+dummy_color = []
+num_pts = 1000
+for i in range(num_pts):
+    rand_risk = .22 + (.99-.22)*np.random.random()
+    noise = min(0.5, abs(np.random.normal(0, 0.3)))
+    dummy_risk.append(rand_risk)
+    dummy_return.append(returns[ind_map[round(rand_risk, 2)]] - noise)
+    dummy_color.append(noise)
+    
+names = risk_return_df['Name'].tolist()
+scatter_df = pd.DataFrame(zip(dummy_risk, dummy_return, dummy_color), columns=['Risk', 'Return','Color'])
+print(scatter_df)
+
+trial_info_df = risk_return_df[['NCT', 'Website', 'Condition']]
+trial_info_df.insert(2, 'Link', [f"<a href='{website}' target='_blank'>{website}</a>" for website in trial_info_df['Website']])
+trial_info_df = trial_info_df.drop(columns=["Website"])
+
 # Styles
 component_box_style = {
     'border': '2px solid #DDD',  # Lighter border for the white box
@@ -55,10 +73,11 @@ app.layout = html.Div([
     html.Div([  # Top Row with corrected vertical separator
         html.Div([  # Top Left Quadrant: Title and Slider
             html.H1("Clinical Trial Investing", style=header_style),
+            html.H4("Risk Level", style=header_style),
             dcc.Slider(
                 min=min_risk,
                 max=max_risk - 0.005,
-                step=0.001,
+                step=0.01,
                 marks=None,
                 value=data['Risk'][n//2],
                 id='risk_slider',
@@ -67,20 +86,34 @@ app.layout = html.Div([
             html.Div([  # DataFrame display
                 dash_table.DataTable(
                     id='table',
-                    columns=[{"name": i, "id": i} for i in trial_info_df.columns],
+                    columns=[{"id": "NCT", "name" : "NCT"},
+                             {"id": "Condition", "name": "Condition"},
+                             {"id": "Link", "name" : "Website", "presentation" : "markdown"}],
                     data=trial_info_df.to_dict('records'),
-                    style_cell={'textAlign': 'left'},
+                    style_cell={
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'maxWidth': 10,
+                        'textAlign': 'left'
+                    },
                     style_header={
                         'backgroundColor': 'white',
                         'fontWeight': 'bold'
                     },
+                    style_cell_conditional=[
+                        {'if': {'column_id': 'NCT'},
+                        'width': '15%'},
+                    ],
                     style_as_list_view=True,
+                    page_size=10,
+                    markdown_options={"html": True},
                 )
             ], style={'marginTop': '20px'}),
 
         ], style={**component_box_style, 'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
         
         html.Div([  # Top Right Quadrant: Pie Chart
+            
             dcc.Graph(id="graph"),
         ], style={**component_box_style, 'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
     ], style={'display': 'flex', 'boxSizing': 'border-box', 'alignItems': 'stretch', 'backgroundColor': background_color, 'justifyContent': 'space-between'}),
@@ -93,6 +126,8 @@ app.layout = html.Div([
 
 
 
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 
 @app.callback(
     Output(component_id='graph', component_property='figure'),
@@ -102,11 +137,14 @@ def generate_chart(risk_slider):
     # ind = bisect.bisect_left(ind_map.keys(), risk_slider)
     risk_slider = round(risk_slider, 3)
     df = pd.DataFrame(zip(names, weights.iloc[ind_map[risk_slider]].values), columns = ['name', 'weight'])
-    fig = px.pie(df, values='weight', names='name', hole=0.2)
+    fig = px.pie(df, values='weight', names='name', hole=0.3, labels=None)
     fig.update_layout(
         title_text='Portfolio Allocation Weights',
         font=dict(family="Times New Roman", size=20, color="RebeccaPurple")  # Update font here
     )
+    fig.update_traces(textposition='inside')
+    fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide', showlegend=False)
+    fig.update_layout(margin=dict(t=40, b=0, l=0, r=0))
     return fig
 
 @app.callback(
@@ -120,12 +158,16 @@ def update_output(risk_slider):
     Input('risk_slider', 'value'))
 def update_graph(risk_slider):
     # Create the scatter plot
-    fig = px.scatter(data, x='Risk', y='Return')
-    fig.add_scatter(x=[risk_slider], y=[data['Return'][ind_map[risk_slider]]], mode='markers', marker=dict(color='red', size=20), name='Selected Risk Level')
-    
+    fig = px.scatter(scatter_df, x='Risk', y='Return', color='Color')
+    fig2 = px.line(data, x='Risk', y='Return')
+    fig2.update_traces(line_color='#FFA500', line_width=5)
+    fig.update_coloraxes(showscale=False)
+    fig.update_traces(showlegend=False)
+    fig2.add_scatter(x=[risk_slider], y=[data['Return'][ind_map[risk_slider]]], mode='markers', marker=dict(color='red', size=20), name='Selected Risk Level')
+    fig.add_traces(fig2.data)
     fig.update_layout(
         title='Efficient Frontier (Risk Return Trade-off)',
-        font=dict(family="Times New Roman", size=20, color="RebeccaPurple")  # Update font here
+        font=dict(family="Times New Roman", size=20, color="RebeccaPurple"),  # Update font here
     )
     return fig
 

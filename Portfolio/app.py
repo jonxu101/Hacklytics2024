@@ -18,9 +18,9 @@ min_risk = data['Risk'][0]
 max_risk = data['Risk'][n - 1]
 incr = data['Risk'][0]
 
-names = pd.read_csv('./riskreturn.csv')['Name'].tolist()
-print(names)
-print(weights.iloc[0].values)
+names = pd.read_csv('./predicted.csv')['Name'].tolist()
+# print(names)
+# print(weights.iloc[0].values)
 
 ind_map = collections.OrderedDict()
 ind_map = {

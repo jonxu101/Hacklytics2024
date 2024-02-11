@@ -139,22 +139,25 @@ R = min # risk tolerance
 tol = 0.000001
 prev = 0.0
 print("t3")
+itr = 0
 while R < max:
     try:
-        res = ef.efficient_risk(R)
+        res = ef.efficient_risk(R*R)
         print("t4")
         res = np.array([i[1] for i in res.items()])
         
-        # print("t5")
-        frontier_risk.append(np.sqrt(round(R, 3)))
+        print("t5")
+        frontier_risk.append(round(R, 2))
         frontier_return.append(ComputeReturns(data, res))
         frontier_weights.append(res)
         R += incr
         # if frontier_return[-1] - prev < tol:
         #     break
         prev = frontier_return[-1]
-        pd.DataFrame(frontier_weights, columns = [str(i) for i in range(n)]).to_csv("./weights.csv", index = False)
-        pd.DataFrame(zip(frontier_risk,frontier_return), columns = ['Risk', 'Return']).to_csv("./efficient_frontier.csv", index = False)
+        itr += 1
+        if itr % 10 == 0:
+            pd.DataFrame(frontier_weights, columns = [str(i) for i in range(n)]).to_csv("./weights.csv", index = False)
+            pd.DataFrame(zip(frontier_risk,frontier_return), columns = ['Risk', 'Return']).to_csv("./efficient_frontier.csv", index = False)
     except ValueError as e:
         print("except")
         R += incr
